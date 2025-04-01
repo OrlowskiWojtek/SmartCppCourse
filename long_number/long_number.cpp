@@ -91,9 +91,9 @@ LongNumber LongNumber::operator*(const LongNumber &obj) const {
     bool isNegativeOutput = ((leftSign * rightSign) == -1);
     int decimalDigitsOutput = this->numDecimalDigits + obj.numDecimalDigits;
 
-    const std::vector<int8_t> longerNumber = (this->digits.size() >= obj.digits.size()) ? (this->digits)
+    std::vector<int8_t> longerNumber = (this->digits.size() >= obj.digits.size()) ? (this->digits)
                                                                                          : (obj.digits);
-    const std::vector<int8_t> shorterNumber = (this->digits.size() < obj.digits.size()) ? (this->digits)
+    std::vector<int8_t> shorterNumber = (this->digits.size() < obj.digits.size()) ? (this->digits)
                                                                                          : (obj.digits);
 
     std::reverse(longerNumber.begin(), longerNumber.end());     // tak się łatwiej mnoży -> nie jest najkorzystniejsze ale ułatwia
