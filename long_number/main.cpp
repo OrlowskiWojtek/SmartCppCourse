@@ -7,7 +7,6 @@
 #include <iostream>
 #include <string>
 #include <exception>
-#include <sstream>
 #include <unordered_map>
 #include <functional>
 #include "long_number.hpp"
@@ -33,7 +32,7 @@ void runCalculator() {
     std::unordered_map<std::string, std::function<std::string(LongNumber&, LongNumber&)>> operations_map = {
         // {"+", [](LongNumber& f1, LongNumber& f2){return (f1 + f2).str();}},
         // {"-", [](LongNumber& f1, LongNumber& f2){return (f1 - f2).str();}},
-        // {"*", [](LongNumber& f1, LongNumber& f2){return (f1 * f2).str();}},
+         {"*", [](LongNumber& f1, LongNumber& f2){return (f1 * f2).str();}},
         // {"/", [](LongNumber& f1, LongNumber& f2){return (f1 / f2).str();}},
         // {"==", [](LongNumber& f1, LongNumber& f2){return (f1 == f2) ? "True" : "False";}},
         // {"!=", [](LongNumber& f1, LongNumber& f2){return (f1 != f2) ? "True" : "False";}},        
@@ -79,6 +78,9 @@ void runTests() {
     std::cout << x1 << '\n';
     LongNumber x3(std::string("-12312.137"));
     std::cout << x3 << '\n';
+
+    std::cout << "Mnożenie:\n";
+    std::cout << x1 << " * " << x3 << " = " << x1*x3 << "\n";
 
     std::vector<int8_t> n = {1,2,3};
     LongNumber x4(n, 1, true);
