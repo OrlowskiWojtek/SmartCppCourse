@@ -5,6 +5,7 @@ LongNumber::LongNumber() {
     this->digits = std::vector<int8_t>(1, 0);
     this->numDecimalDigits = 0;
     this->isNegative = false;
+    strip();
 }
 
 LongNumber::LongNumber(const std::vector<int8_t> &digits, int numDecimalDigits, bool isNegative) {
@@ -15,18 +16,20 @@ LongNumber::LongNumber(const std::vector<int8_t> &digits, int numDecimalDigits, 
     this->digits = digits;
     this->numDecimalDigits = numDecimalDigits;
     this->isNegative = isNegative;
+    strip();
 }
 
 LongNumber::LongNumber(const std::string &str) {
     populateWithString(str);
+    strip();
 }
 
 std::string LongNumber::str() const {
     std::ostringstream ss;
 
-  //  for (int i = 0; i < digits.size(); i++) {
-  //      ss << (char)(digits[i] + '0');
-  //  }
+    //  for (int i = 0; i < digits.size(); i++) {
+    //      ss << (char)(digits[i] + '0');
+    //  }
 
     if (isNegative) {
         ss << '-';
@@ -53,7 +56,8 @@ void LongNumber::populateWithString(const std::string &str) {
 
     for (int i = 0; i < str.size(); i++) {
         char c = str[i];
-        if (dotSeen) numDecimalDigitsTemp++;
+        if (dotSeen)
+            numDecimalDigitsTemp++;
 
         if (c >= '0' && c <= '9') {
             digitsTemp.push_back(c - '0');
@@ -73,6 +77,50 @@ void LongNumber::populateWithString(const std::string &str) {
     isNegative = isNegativeTemp;
 }
 
+void LongNumber::strip() {
+    int start = 0;
+    int end = 0;
+
+    if (digits.size() <= 1) {
+        return;
+    }
+
+    for (int i = 0; i < digits.size(); i++) {
+        if (digits[i] != 0) {
+            break;
+        }
+        if (digits.size() - i == numDecimalDigits) {
+            break;
+        }
+
+        start++;
+    }
+
+    for (int i = digits.size() - 1; i >= 0; i--) {
+        if (digits[i] != 0) {
+            break;
+        }
+        if (digits.size() - 1 - i == numDecimalDigits) {
+            break;
+        }
+        end++;
+    }
+
+    if (start == end && start == digits.size()) {
+        digits = {0};
+        numDecimalDigits = 0;
+        isNegative = false;
+        return;
+    }
+
+    if(start == digits.size() - numDecimalDigits){
+        start--;
+    }
+
+    numDecimalDigits -= end;
+    digits = {digits.begin() + start, digits.end() - end};
+}
+
 std::ostream &operator<<(std::ostream &os, const LongNumber &num) {
     os << num.str();
     return os;
@@ -82,6 +130,7 @@ std::istream &operator>>(std::istream &is, LongNumber &frac) {
     std::string input;
     is >> input;
     frac.populateWithString(input);
+    frac.strip();
     return is;
 }
 
@@ -91,13 +140,12 @@ LongNumber LongNumber::operator*(const LongNumber &obj) const {
     bool isNegativeOutput = ((leftSign * rightSign) == -1);
     int decimalDigitsOutput = this->numDecimalDigits + obj.numDecimalDigits;
 
-    std::vector<int8_t> longerNumber = (this->digits.size() >= obj.digits.size()) ? (this->digits)
-                                                                                         : (obj.digits);
-    std::vector<int8_t> shorterNumber = (this->digits.size() < obj.digits.size()) ? (this->digits)
-                                                                                         : (obj.digits);
+    std::vector<int8_t> longerNumber = (this->digits.size() >= obj.digits.size()) ? (this->digits) : (obj.digits);
+    std::vector<int8_t> shorterNumber = (this->digits.size() < obj.digits.size()) ? (this->digits) : (obj.digits);
 
-    std::reverse(longerNumber.begin(), longerNumber.end());     // tak się łatwiej mnoży -> nie jest najkorzystniejsze ale ułatwia
-    std::reverse(shorterNumber.begin(), shorterNumber.end());   // warto tak zrobić w pierwszej wersji
+    std::reverse(longerNumber.begin(),
+                 longerNumber.end()); // tak się łatwiej mnoży -> nie jest najkorzystniejsze ale ułatwia
+    std::reverse(shorterNumber.begin(), shorterNumber.end()); // warto tak zrobić w pierwszej wersji
 
     std::vector<int8_t> digitsTemp;
     std::vector<int8_t> digitsOutput;
@@ -107,33 +155,33 @@ LongNumber LongNumber::operator*(const LongNumber &obj) const {
     int8_t overTenAddition = 0;
     int8_t temp;
 
-    for(int i = 0; i < shorterNumber.size(); i++){
+    for (int i = 0; i < shorterNumber.size(); i++) {
         digitsTemp.resize(longerNumber.size() + i);
         std::fill(digitsTemp.begin(), digitsTemp.end(), 0);
 
-        for(size_t j = 0; j < longerNumber.size(); j++){
+        for (size_t j = 0; j < longerNumber.size(); j++) {
             temp = shorterNumber.at(i) * longerNumber.at(j) + overTen;
             overTen = 0;
-            if(temp >= 10){
+            if (temp >= 10) {
                 overTen = temp / 10;
                 temp = temp % 10;
             }
             digitsTemp[i + j] = temp;
         }
-        
-        if(overTen > 0){
+
+        if (overTen > 0) {
             digitsTemp.insert(digitsTemp.end(), overTen);
             overTen = 0;
         }
 
         // Można to też zrobić poprzez operator + (jeszcze nie zdefiniowany)
-        for(size_t j = 0; j < digitsTemp.size(); j++){
-            if(j >= digitsOutput.size()){
+        for (size_t j = 0; j < digitsTemp.size(); j++) {
+            if (j >= digitsOutput.size()) {
                 digitsOutput.insert(digitsOutput.end(), 0);
             }
             temp = digitsOutput[j] + digitsTemp[j] + overTenAddition;
             overTenAddition = 0;
-            if(temp >= 10){
+            if (temp >= 10) {
                 overTenAddition = temp / 10;
                 temp = temp % 10;
             }
@@ -141,7 +189,7 @@ LongNumber LongNumber::operator*(const LongNumber &obj) const {
         }
     }
 
-    std::reverse(digitsOutput.begin() , digitsOutput.end());
+    std::reverse(digitsOutput.begin(), digitsOutput.end());
 
     return LongNumber(digitsOutput, decimalDigitsOutput, isNegativeOutput);
 }
@@ -232,4 +280,61 @@ LongNumber LongNumber::operator-(const LongNumber &other) const {
     }
 
     return LongNumber(resultDigits, maxDecimalDigits, resultNegative);
+}
+
+bool LongNumber::operator!=(LongNumber const &obj) const {
+    if (this->digits.size() != obj.digits.size())
+        return true;
+
+    if (this->isNegative != obj.isNegative)
+        return true;
+
+    if (this->numDecimalDigits != obj.numDecimalDigits)
+        return true;
+
+    for (int i = 0; i < this->digits.size(); i++) {
+        if (this->digits[i] != obj.digits[i]) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool LongNumber::operator>(LongNumber const &obj) const {
+    if (this->isNegative != obj.isNegative)
+        return obj.isNegative;
+
+    if ((this->digits.size() - this->numDecimalDigits) > (obj.digits.size() - obj.numDecimalDigits))
+        return true;
+
+    if ((this->digits.size() - this->numDecimalDigits) < (obj.digits.size() - obj.numDecimalDigits))
+        return false;
+
+    for (int i = 0; i < this->digits.size(); i++) {
+        if (this->digits[i] > obj.digits[i]) {
+            return true;
+        }
+        if (this->digits[i] < obj.digits[i]) {
+            return false;
+        }
+    }
+
+    return false;
+}
+
+bool LongNumber::operator==(LongNumber const &obj) const {
+    return !(*this != obj);
+}
+
+bool LongNumber::operator<(LongNumber const &obj) const {
+    return (obj > *this);
+}
+
+bool LongNumber::operator>=(LongNumber const &obj) const {
+    return !(*this < obj);
+}
+
+bool LongNumber::operator<=(LongNumber const &obj) const {
+    return !(*this > obj);
 }
