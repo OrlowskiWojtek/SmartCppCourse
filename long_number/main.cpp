@@ -1,17 +1,11 @@
-
-
-
-
-
 // Program w C++
+#include <ios>
 #include <iostream>
 #include <string>
 #include <exception>
 #include <unordered_map>
 #include <functional>
 #include "long_number.hpp"
-
-
 
 void runTests();
 void runCalculator();
@@ -30,14 +24,14 @@ void runCalculator() {
     // Odkomentowujcie to co zrobicie w operatorach, zeby bylo dostepne w kalulatorze
     // Dodajcie tez jakies przykladowe testy w runTests
     std::unordered_map<std::string, std::function<std::string(LongNumber&, LongNumber&)>> operations_map = {
-        // {"+", [](LongNumber& f1, LongNumber& f2){return (f1 + f2).str();}},
-        // {"-", [](LongNumber& f1, LongNumber& f2){return (f1 - f2).str();}},
+         {"+", [](LongNumber& f1, LongNumber& f2){return (f1 + f2).str();}},
+         {"-", [](LongNumber& f1, LongNumber& f2){return (f1 - f2).str();}},
          {"*", [](LongNumber& f1, LongNumber& f2){return (f1 * f2).str();}},
         // {"/", [](LongNumber& f1, LongNumber& f2){return (f1 / f2).str();}},
-        // {"==", [](LongNumber& f1, LongNumber& f2){return (f1 == f2) ? "True" : "False";}},
-        // {"!=", [](LongNumber& f1, LongNumber& f2){return (f1 != f2) ? "True" : "False";}},        
-        // {"<", [](LongNumber& f1, LongNumber& f2){return (f1 < f2) ? "True" : "False";}},        
-        // {">", [](LongNumber& f1, LongNumber& f2){return (f1 > f2) ? "True" : "False";}}
+         {"==", [](LongNumber& f1, LongNumber& f2){return (f1 == f2) ? "True" : "False";}},
+         {"!=", [](LongNumber& f1, LongNumber& f2){return (f1 != f2) ? "True" : "False";}},        
+         {"<", [](LongNumber& f1, LongNumber& f2){return (f1 < f2) ? "True" : "False";}},        
+         {">", [](LongNumber& f1, LongNumber& f2){return (f1 > f2) ? "True" : "False";}}
     };
     
     std::cout << "Available Operations: ";
@@ -81,6 +75,21 @@ void runTests() {
 
     std::cout << "Mnożenie:\n";
     std::cout << x1 << " * " << x3 << " = " << x1*x3 << "\n";
+
+    std::cout << "Dodawanie:\n";
+    std::cout << x1 << " + " << x3 << " = " << x1+x3 << "\n";
+
+    std::cout << "Odejmowanie:\n";
+    std::cout << x1 << " - " << x3 << " = " << x1-x3 << "\n";
+
+    std::cout << "Są równe:\n";
+    std::cout << std::boolalpha << x1 << " == " << x3 << " = " << (x1 == x3) << "\n";
+
+    std::cout << "Nie są równe:\n";
+    std::cout << std::boolalpha  << x1 << " != " << x3 << " = " << (x1 != x3) << "\n";
+
+    std::cout << "Pierwsza liczba jest większa:\n";
+    std::cout << std::boolalpha  << x1 << " > " << x3 << " = " << (x1 > x3) << "\n";
 
     std::vector<int8_t> n = {1,2,3};
     LongNumber x4(n, 1, true);
