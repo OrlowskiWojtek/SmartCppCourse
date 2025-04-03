@@ -145,3 +145,91 @@ LongNumber LongNumber::operator*(const LongNumber &obj) const {
 
     return LongNumber(digitsOutput, decimalDigitsOutput, isNegativeOutput);
 }
+
+LongNumber LongNumber::operator+(const LongNumber &other) const {
+    if (this->isNegative != other.isNegative) {
+        LongNumber copy = other;
+        copy.isNegative = !copy.isNegative;
+        return *this - copy;
+    }
+
+    int maxDecimalDigits = std::max(this->numDecimalDigits, other.numDecimalDigits);
+    int thisExtraZeros = maxDecimalDigits - this->numDecimalDigits;
+    int otherExtraZeros = maxDecimalDigits - other.numDecimalDigits;
+
+    std::vector<int8_t> digits1 = this->digits;
+    std::vector<int8_t> digits2 = other.digits;
+
+    digits1.insert(digits1.end(), thisExtraZeros, 0);
+    digits2.insert(digits2.end(), otherExtraZeros, 0);
+
+    if (digits1.size() < digits2.size()) {
+        digits1.insert(digits1.begin(), digits2.size() - digits1.size(), 0);
+    } else if (digits2.size() < digits1.size()) {
+        digits2.insert(digits2.begin(), digits1.size() - digits2.size(), 0);
+    }
+
+    std::vector<int8_t> resultDigits(digits1.size(), 0);
+    int8_t carry = 0;
+
+    for (int i = digits1.size() - 1; i >= 0; i--) {
+        int sum = digits1[i] + digits2[i] + carry;
+        resultDigits[i] = sum % 10;
+        carry = sum / 10;
+    }
+
+    if (carry > 0) {
+        resultDigits.insert(resultDigits.begin(), carry);
+    }
+
+    return LongNumber(resultDigits, maxDecimalDigits, this->isNegative);
+}
+
+LongNumber LongNumber::operator-(const LongNumber &other) const {
+    if (this->isNegative != other.isNegative) {
+        LongNumber copy = other;
+        copy.isNegative = !copy.isNegative;
+        return *this + copy;
+    }
+
+    LongNumber a = *this;
+    LongNumber b = other;
+    bool resultNegative = false;
+
+    int maxDecimalDigits = std::max(a.numDecimalDigits, b.numDecimalDigits);
+    a.digits.insert(a.digits.end(), maxDecimalDigits - a.numDecimalDigits, 0);
+    b.digits.insert(b.digits.end(), maxDecimalDigits - b.numDecimalDigits, 0);
+
+    if (a.digits.size() < b.digits.size()) {
+        a.digits.insert(a.digits.begin(), b.digits.size() - a.digits.size(), 0);
+    } else if (b.digits.size() < a.digits.size()) {
+        b.digits.insert(b.digits.begin(), a.digits.size() - b.digits.size(), 0);
+    }
+
+    if (a.digits < b.digits) {
+        std::swap(a.digits, b.digits);
+        resultNegative = !a.isNegative;
+    } else {
+        resultNegative = a.isNegative;
+    }
+
+    std::vector<int8_t> resultDigits(a.digits.size(), 0);
+    int8_t borrow = 0;
+
+    for (int i = a.digits.size() - 1; i >= 0; i--) {
+        int diff = a.digits[i] - b.digits[i] - borrow;
+        if (diff < 0) {
+            diff += 10;
+            borrow = 1;
+        } else {
+            borrow = 0;
+        }
+        resultDigits[i] = diff;
+    }
+
+    while (resultDigits.size() > 1 && resultDigits[0] == 0) {
+        resultDigits.erase(resultDigits.begin());
+    }
+
+    return LongNumber(resultDigits, maxDecimalDigits, resultNegative);
+}
